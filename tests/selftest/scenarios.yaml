@@ -42,3 +42,18 @@
   scenario: anneka_busy_calendar
   hobby: call_friend
   expect_suggest: false
+
+- id: darian_hiking_positive
+  description: Darian gets hiking suggestion on sunny Saturday
+  user: darian
+  scenario: darian_hiking_sunny
+  hobby: hiking
+  expect_suggest: true
+  min_score: 0.55
+
+- id: mo_injury_suppresses_surf
+  description: Injury fact suppresses surf despite perfect swell
+  user: mo
+  scenario: mo_injury_suppresses_surf
+  hobby: surf
+  expect_suggest: false

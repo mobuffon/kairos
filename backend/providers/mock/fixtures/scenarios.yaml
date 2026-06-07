@@ -108,3 +108,39 @@ anneka_busy_calendar:
     - name: Maria
       contact_frequency_days: 30
       last_contacted_at: "2025-05-01T10:00:00+00:00"
+
+darian_hiking_sunny:
+  user: darian
+  reference_time: "2025-06-08T08:00:00+01:00"
+  weather:
+    hourly:
+      - time: "2025-06-08T10:00:00+01:00"
+        temperature_c: 18
+        rain_probability: 10
+        wind_speed_kmh: 15
+  marine:
+    hourly: []
+  calendar_gaps:
+    - start: "2025-06-08T10:00:00+01:00"
+      end: "2025-06-08T14:00:00+01:00"
+  calendar_busy: false
+
+mo_injury_suppresses_surf:
+  user: mo
+  reference_time: "2025-06-09T06:00:00+01:00"
+  weather:
+    hourly: []
+  marine:
+    hourly:
+      - time: "2025-06-09T07:30:00+01:00"
+        wave_height: 1.6
+        wind_speed_knots: 8
+        swell_period: 11
+  calendar_gaps:
+    - start: "2025-06-09T07:30:00+01:00"
+      end: "2025-06-09T10:30:00+01:00"
+  calendar_busy: false
+  profile_facts:
+    - category: injury
+      fact: broken right arm
+      valid_until: "2026-12-01T00:00:00+00:00"

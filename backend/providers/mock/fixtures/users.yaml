@@ -58,6 +58,13 @@ darian:
   location_lng: -0.1278
   location_label: London, UK
   hobbies:
+    - hobby_type: hiking
+      enabled: true
+      config:
+        min_temp_c: 10
+        max_temp_c: 26
+        max_rain_probability: 25
+        daylight_only: true
     - hobby_type: call_friend
       enabled: true
       config:

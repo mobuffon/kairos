@@ -3,11 +3,13 @@
 from backend.skills.base import BaseSkill
 from backend.skills.call_friend import CallFriendSkill
 from backend.skills.cycling import CyclingSkill
+from backend.skills.hiking import HikingSkill
 from backend.skills.surf import SurfSkill
 
 SKILL_REGISTRY: dict[str, type[BaseSkill]] = {
     "surf": SurfSkill,
     "cycling": CyclingSkill,
+    "hiking": HikingSkill,
     "call_friend": CallFriendSkill,
 }
 
