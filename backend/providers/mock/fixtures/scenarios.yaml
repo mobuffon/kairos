@@ -1,0 +1,110 @@
+mo_surf_perfect:
+  user: mo
+  reference_time: "2025-06-09T06:00:00+01:00"
+  weather:
+    hourly: []
+  marine:
+    hourly:
+      - time: "2025-06-09T07:30:00+01:00"
+        wave_height: 1.6
+        wind_speed_knots: 8
+        swell_period: 11
+        wind_direction: offshore
+  calendar_gaps:
+    - start: "2025-06-09T07:30:00+01:00"
+      end: "2025-06-09T10:30:00+01:00"
+  calendar_busy: false
+
+mo_cycling_weekend:
+  user: mo
+  reference_time: "2025-06-07T08:00:00+01:00"
+  weather:
+    hourly:
+      - time: "2025-06-07T09:00:00+01:00"
+        temperature_c: 18
+        rain_probability: 5
+        wind_speed_kmh: 12
+  marine:
+    hourly: []
+  calendar_gaps:
+    - start: "2025-06-07T09:00:00+01:00"
+      end: "2025-06-07T12:00:00+01:00"
+  calendar_busy: false
+
+anneka_call_sunday:
+  user: anneka
+  reference_time: "2025-06-08T14:00:00+02:00"
+  weather:
+    hourly: []
+  marine:
+    hourly: []
+  calendar_gaps:
+    - start: "2025-06-08T15:00:00+02:00"
+      end: "2025-06-08T17:00:00+02:00"
+  calendar_busy: false
+  contacts:
+    - name: Maria
+      contact_frequency_days: 30
+      last_contacted_at: "2025-05-01T10:00:00+00:00"
+
+darian_call_overdue:
+  user: darian
+  reference_time: "2025-06-08T10:00:00+01:00"
+  weather:
+    hourly: []
+  marine:
+    hourly: []
+  calendar_gaps:
+    - start: "2025-06-08T11:00:00+01:00"
+      end: "2025-06-08T13:00:00+01:00"
+  calendar_busy: false
+  contacts:
+    - name: Felix
+      contact_frequency_days: 42
+      last_contacted_at: "2025-03-15T14:00:00+00:00"
+
+mo_surf_flat_swell:
+  user: mo
+  reference_time: "2025-06-09T06:00:00+01:00"
+  weather:
+    hourly: []
+  marine:
+    hourly:
+      - time: "2025-06-09T07:30:00+01:00"
+        wave_height: 0.4
+        wind_speed_knots: 5
+        swell_period: 6
+  calendar_gaps:
+    - start: "2025-06-09T07:30:00+01:00"
+      end: "2025-06-09T10:30:00+01:00"
+  calendar_busy: false
+
+mo_cycling_rainy:
+  user: mo
+  reference_time: "2025-06-07T08:00:00+01:00"
+  weather:
+    hourly:
+      - time: "2025-06-07T09:00:00+01:00"
+        temperature_c: 16
+        rain_probability: 80
+        wind_speed_kmh: 10
+  marine:
+    hourly: []
+  calendar_gaps:
+    - start: "2025-06-07T09:00:00+01:00"
+      end: "2025-06-07T12:00:00+01:00"
+  calendar_busy: false
+
+anneka_busy_calendar:
+  user: anneka
+  reference_time: "2025-06-08T14:00:00+02:00"
+  weather:
+    hourly: []
+  marine:
+    hourly: []
+  calendar_gaps: []
+  calendar_busy: true
+  contacts:
+    - name: Maria
+      contact_frequency_days: 30
+      last_contacted_at: "2025-05-01T10:00:00+00:00"

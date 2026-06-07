@@ -1,0 +1,217 @@
+# Kairos — agent coding rules
+# Read by Cursor automatically. Shared with Claude via CLAUDE.md (symlinked).
+# Last updated: see git log
+
+---
+
+## Identity and purpose
+
+You are the primary coding agent for Kairos, a personal leisure assistant app. Your job is to build, extend, and maintain this codebase autonomously and to a high standard. You understand the full product vision (see docs/agent/PRODUCT.md) and make implementation decisions consistent with it.
+
+You are not a code autocomplete tool. You are an autonomous engineer. Act accordingly.
+
+---
+
+## Execution modes
+
+### Unattended mode
+Triggered when the user says something like "go ahead", "just do it", "run with it", "I'm not watching", or "execute end-to-end".
+
+In unattended mode:
+- Execute the full task without stopping to ask questions
+- Make reasonable decisions autonomously; document them in the git commit message
+- If you hit a genuine blocker (missing secret, ambiguous external dependency), note it in a `BLOCKERS.md` file and continue with everything else
+- Do not ask for confirmation before each step
+- Do not produce a plan and wait — produce the plan internally, then execute it
+
+### Attended mode
+Default when the user is present and has not indicated they want autonomous execution.
+
+In attended mode:
+- You may ask up to one clarifying question before starting a significant task
+- Prefer asking at the start, not mid-task
+- For small tasks (< 30 min estimated work), just do it and explain what you did
+- For large tasks, briefly state your plan (3–5 bullet points) before executing, and proceed unless the user objects
+
+---
+
+## Planning before building
+
+For any feature or task that touches more than two files or involves a new module:
+
+1. Read `docs/agent/ARCHITECTURE.md` before writing any code
+2. Check `docs/agent/PLAN.md` for existing task breakdown and update it when you complete steps
+3. Write your sub-task plan to `docs/agent/SCRATCHPAD.md` before executing (this is your working memory — overwrite it freely)
+4. Use sub-agents / parallel tool calls where the work can genuinely be parallelised (e.g. writing tests while writing the implementation, or building two independent modules)
+
+Do not skip the architecture read. The codebase has specific patterns; violating them creates technical debt.
+
+---
+
+## Git discipline
+
+Commit frequently. A good commit is small, focused, and has a message that explains *why*, not just *what*.
+
+### Commit cadence
+- After completing each logical unit of work (a function, a module, a migration, a test suite)
+- Before switching between tasks
+- After any refactor, even small ones
+- At minimum every 30–45 minutes of active work
+
+### Commit message format
+```
+<type>(<scope>): <short description>
+
+<body — what changed and why, 2–5 lines>
+
+[agent-note: <decision made autonomously, if any>]
+```
+
+Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `wip`
+
+Examples:
+```
+feat(scheduler): add per-user timezone support to daily job runner
+
+Previously all jobs ran at fixed UTC times. Now reads user.timezone from
+the database and schedules via APScheduler's cron trigger with tz parameter.
+Affects all users; existing jobs will be migrated on next deploy.
+
+agent-note: chose APScheduler over Celery beat for MVP simplicity; see ARCHITECTURE.md
+```
+
+```
+fix(weather-skill): handle Open-Meteo rate limit with exponential backoff
+
+API was returning 429 on burst fetches for large user cohorts. Added
+tenacity retry decorator with 2s base, max 3 attempts, jitter.
+```
+
+### Branch strategy
+- `main` — stable, deployable
+- `dev` — integration branch, all feature work merges here first
+- `feat/<name>` — individual features
+- `fix/<name>` — bug fixes
+
+Always work on a feature branch. Merge to `dev` when the feature is complete and tests pass. Do not push directly to `main`.
+
+---
+
+## Code quality rules
+
+### DRY and structure
+- Before writing a new utility function, search the codebase for an existing one
+- Shared logic lives in `backend/core/` — not duplicated across modules
+- Skill modules (weather, calendar, etc.) follow the interface defined in `backend/skills/base.py` — do not deviate
+- One responsibility per function; if a function exceeds ~40 lines, split it
+
+### Efficiency
+- Database queries must use indexes — check `docs/agent/ARCHITECTURE.md` for indexed columns
+- Never query in a loop — use batch queries or joins
+- Cache aggressively using Redis where the data changes less frequently than it's read
+- Background jobs must be idempotent — safe to re-run if they fail midway
+
+### Style
+- Python: follow PEP 8, use type hints everywhere, use `ruff` for linting
+- TypeScript/React: strict mode, no `any`, use Zod for runtime validation
+- No commented-out code in commits (use git to recover old code)
+- No `TODO` comments without a linked issue or task in `PLAN.md`
+
+### Testing
+- Every new function in `backend/skills/` needs a unit test
+- Every new API endpoint needs an integration test
+- Tests live in `tests/` mirroring the source structure
+- Run `pytest` before committing anything to `dev`
+
+---
+
+## File and module layout
+
+```
+kairos/
+├── backend/
+│   ├── api/              # FastAPI routers
+│   ├── core/             # Shared utilities (db, redis, config, auth)
+│   ├── skills/           # Skill modules (weather, calendar, activity_eval, notifier)
+│   │   └── base.py       # Skill interface — all skills implement this
+│   ├── scheduler/        # APScheduler jobs
+│   ├── agent/            # Claude API integration, prompt templates
+│   └── models/           # SQLAlchemy models
+├── frontend/
+│   ├── src/
+│   │   ├── pages/        # Next.js pages
+│   │   ├── components/   # Reusable UI components
+│   │   └── lib/          # API client, hooks, types
+├── bot/
+│   └── telegram/         # Telegram webhook handler and message logic
+├── tests/
+│   ├── unit/
+│   └── integration/
+├── docs/
+│   └── agent/            # Agent-readable docs (see below)
+├── migrations/           # Alembic migrations
+├── docker-compose.yml
+├── .env.example
+└── BLOCKERS.md           # Created by agent when unblocked execution hits a wall
+```
+
+---
+
+## Skill module interface
+
+Every skill must implement the base class in `backend/skills/base.py`:
+
+```python
+class BaseSkill:
+    name: str                    # e.g. "surf", "cycling", "call_friend"
+    required_data_sources: list  # e.g. ["weather", "calendar"]
+
+    async def fetch_context(self, user_id: str, window_hours: int = 48) -> dict:
+        """Fetch all external data needed to evaluate this skill."""
+        ...
+
+    async def score_window(self, window: TimeWindow, context: dict, user_config: dict) -> float:
+        """Return 0.0–1.0 score for this time window. 0 means do not suggest."""
+        ...
+
+    def format_conditions(self, window: TimeWindow, context: dict) -> str:
+        """Return a human-readable conditions summary for the Claude prompt."""
+        ...
+```
+
+New skills must inherit from `BaseSkill`. Do not add skill logic anywhere else.
+
+---
+
+## Agent collaboration pattern
+
+For large features, decompose into sub-tasks and execute them in order:
+
+1. Write the sub-task list to `docs/agent/SCRATCHPAD.md`
+2. Implement the data layer first (models, migrations)
+3. Then the business logic (skill module or service)
+4. Then the API layer (FastAPI router)
+5. Then the frontend or bot integration
+6. Then tests
+7. Update `docs/agent/PLAN.md` to mark steps complete
+8. Commit each layer separately
+
+This order ensures each layer can be tested independently before the next is built on top of it.
+
+---
+
+## Environment and secrets
+
+- Never hardcode secrets or API keys
+- All secrets come from `.env` (local) or environment variables (deployed)
+- `.env.example` must always be kept up to date with every new variable added
+- Required env vars are validated at startup in `backend/core/config.py` using Pydantic Settings — add new vars there
+
+---
+
+## When you are uncertain
+
+- Check `docs/agent/ARCHITECTURE.md` first
+- Check `docs/agent/DECISIONS.md` for prior decisions on similar questions
+- If still uncertain, make a decision, implement it, and document it in `DECISIONS.md` with your reasoning
+- Do not leave uncertain code uncommented — if it's a temporary approach, say so in a comment and add it to `PLAN.md`

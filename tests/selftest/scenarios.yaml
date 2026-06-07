@@ -1,0 +1,44 @@
+- id: mo_surf_positive
+  description: Mo gets a surf suggestion on perfect morning swell
+  user: mo
+  scenario: mo_surf_perfect
+  hobby: surf
+  expect_suggest: true
+  min_score: 0.55
+
+- id: mo_cycling_positive
+  description: Mo gets cycling suggestion on clear weekend morning
+  user: mo
+  scenario: mo_cycling_weekend
+  hobby: cycling
+  expect_suggest: true
+  min_score: 0.55
+
+- id: anneka_call_positive
+  description: Anneka gets call_friend when calendar free and contact overdue
+  user: anneka
+  scenario: anneka_call_sunday
+  hobby: call_friend
+  expect_suggest: true
+  min_score: 0.5
+
+- id: mo_surf_negative
+  description: Flat swell should not trigger surf suggestion
+  user: mo
+  scenario: mo_surf_flat_swell
+  hobby: surf
+  expect_suggest: false
+
+- id: mo_cycling_negative
+  description: Rainy weekend should not trigger cycling
+  user: mo
+  scenario: mo_cycling_rainy
+  hobby: cycling
+  expect_suggest: false
+
+- id: anneka_busy_negative
+  description: Busy calendar suppresses call_friend
+  user: anneka
+  scenario: anneka_busy_calendar
+  hobby: call_friend
+  expect_suggest: false
