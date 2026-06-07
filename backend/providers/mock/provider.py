@@ -89,7 +89,10 @@ class MockProvider(DataProvider):
         return bool(self._scenario_data().get("calendar_busy", False))
 
     def build_evaluation_context(self, user_key: str) -> dict[str, Any]:
-        user = self.get_user_fixture(user_key)
+        user = dict(self.get_user_fixture(user_key))
+        scenario_facts = self._scenario_data().get("profile_facts")
+        if scenario_facts is not None:
+            user["profile_facts"] = scenario_facts
         ref = self.reference_time()
         return {
             "user": user,
