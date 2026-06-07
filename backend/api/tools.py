@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from backend.core.auth import decode_access_token
 from backend.providers.mock.provider import MockProvider
 from backend.scheduler.jobs import evaluate_user
+from backend.selftest.scenario_runner import run_all_scenarios
 
 router = APIRouter(prefix="/tools", tags=["tools"])
 security = HTTPBearer(auto_error=False)
@@ -38,6 +39,20 @@ async def list_connections() -> dict[str, list[str]]:
     return {
         "users": provider.list_users(),
         "scenarios": provider.list_scenarios(),
+    }
+
+
+@router.get("/selftest")
+async def run_selftest() -> dict[str, Any]:
+    results = await run_all_scenarios()
+    passed = sum(1 for r in results if r.passed)
+    return {
+        "passed": passed,
+        "total": len(results),
+        "all_passed": passed == len(results),
+        "results": [
+            {"id": r.scenario_id, "passed": r.passed, "message": r.message} for r in results
+        ],
     }
 
 

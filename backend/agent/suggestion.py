@@ -15,7 +15,8 @@ async def generate_suggestion_message(
     user_name = user.get("telegram_username", "friend")
     location = user.get("location_label", "your area")
 
-    if mock or not get_settings().anthropic_api_key:
+    settings = get_settings()
+    if mock or settings.use_mock_llm:
         hobby = suggestion.hobby_type.replace("_", " ")
         return (
             f"Hey {user_name}! {hobby.title()} looks great "

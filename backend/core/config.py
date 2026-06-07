@@ -3,6 +3,12 @@ from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+_PLACEHOLDER_VALUES = frozenset({"...", "sk-ant-...", "change-me-to-random-32-char-string"})
+
+
+def _is_real_secret(value: str) -> bool:
+    return bool(value.strip()) and value.strip() not in _PLACEHOLDER_VALUES
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
@@ -30,6 +36,20 @@ class Settings(BaseSettings):
 
     min_suggestion_score: float = 0.55
     scheduler_interval_minutes: int = 30
+
+    mock_external_apis: bool = False
+
+    @property
+    def use_mock_llm(self) -> bool:
+        return self.mock_external_apis or not _is_real_secret(self.anthropic_api_key)
+
+    @property
+    def use_mock_telegram(self) -> bool:
+        return self.mock_external_apis or not _is_real_secret(self.telegram_bot_token)
+
+    @property
+    def use_mock_calendar(self) -> bool:
+        return self.mock_external_apis or not _is_real_secret(self.google_client_id)
 
 
 @lru_cache

@@ -18,7 +18,7 @@ async def evaluate_message_quality(
     mock: bool = True,
 ) -> LLMEvalResult:
     """Score suggestion message quality. Uses mock heuristics when no API key."""
-    if mock or not get_settings().anthropic_api_key:
+    if mock or get_settings().use_mock_llm:
         score = 0.0
         feedback_parts: list[str] = []
         if len(message) >= 40:
