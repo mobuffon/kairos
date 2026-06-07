@@ -6,7 +6,7 @@ import yaml
 
 from backend.scheduler.jobs import evaluate_user
 
-SCENARIOS_PATH = Path(__file__).resolve().parents[1] / "selftest" / "scenarios.yaml"
+SCENARIOS_PATH = Path(__file__).resolve().parents[2] / "tests" / "selftest" / "scenarios.yaml"
 
 
 @dataclass
