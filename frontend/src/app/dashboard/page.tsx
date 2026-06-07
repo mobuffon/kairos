@@ -31,6 +31,9 @@ export default function DashboardPage() {
         </p>
       )}
       {error && <p style={{ color: "crimson" }}>{error}</p>}
+      <p>
+        <a href="/dev/scenarios">Run more scenarios →</a>
+      </p>
       <h2>Suggestions (Mo — mock surf scenario)</h2>
       <ul>
         {suggestions.map((s, i) => (

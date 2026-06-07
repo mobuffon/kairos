@@ -1,0 +1,16 @@
+{
+  "install": "python3 -m venv .venv && . .venv/bin/activate && pip install -e '.[dev]' && cp -n .env.example .env",
+  "start": "docker compose up --build -d || echo 'Docker unavailable — run: source .venv/bin/activate && uvicorn backend.main:app --reload'",
+  "test": "source .venv/bin/activate && pytest tests/ -v",
+  "terminals": [
+    {
+      "name": "API",
+      "command": "source .venv/bin/activate && uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload"
+    },
+    {
+      "name": "Frontend",
+      "command": "cd frontend && npm install && npm run dev"
+    }
+  ],
+  "notes": "Set MOCK_EXTERNAL_APIS=true in .env for fully offline dev. Docker required for Postgres/Redis health checks; tests run without DB."
+}

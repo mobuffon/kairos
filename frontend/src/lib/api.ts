@@ -36,3 +36,39 @@ export async function healthCheck(): Promise<Record<string, string>> {
   const res = await fetch(`${API_URL}/health`);
   return res.json();
 }
+
+export type ConnectionInfo = {
+  users: string[];
+  scenarios: string[];
+};
+
+export type SelftestResult = {
+  id: string;
+  passed: boolean;
+  message: string;
+};
+
+export type SelftestResponse = {
+  passed: number;
+  total: number;
+  all_passed: boolean;
+  results: SelftestResult[];
+};
+
+export async function getConnections(): Promise<ConnectionInfo> {
+  const res = await fetch(`${API_URL}/tools/connections`);
+  if (!res.ok) throw new Error("Failed to load connections");
+  return res.json();
+}
+
+export async function runSelftest(): Promise<SelftestResponse> {
+  const res = await fetch(`${API_URL}/tools/selftest`);
+  if (!res.ok) throw new Error("Selftest failed");
+  return res.json();
+}
+
+export async function getGoogleOAuthUrl(): Promise<{ url: string; mock?: string; message?: string }> {
+  const res = await fetch(`${API_URL}/auth/google/url`);
+  if (!res.ok) throw new Error("OAuth URL failed");
+  return res.json();
+}

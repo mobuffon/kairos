@@ -13,7 +13,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <a href="/" style={{ marginRight: "1rem" }}>Home</a>
           <a href="/dashboard" style={{ marginRight: "1rem" }}>Dashboard</a>
           <a href="/onboard" style={{ marginRight: "1rem" }}>Onboard</a>
-          <a href="/settings">Settings</a>
+          <a href="/settings" style={{ marginRight: "1rem" }}>Settings</a>
+          <a href="/dev/scenarios">Dev</a>
         </nav>
         {children}
       </body>
