@@ -18,6 +18,36 @@
 
 ## Decisions
 
+### [2025-06-08] MOCK_EXTERNAL_APIS with placeholder secret detection
+
+**Context:** Overnight build must run without Telegram, Google, or Anthropic credentials.
+**Options considered:** (a) Require all secrets upfront. (b) Separate mock flag per provider. (c) Global `MOCK_EXTERNAL_APIS` plus treat `.env.example` placeholders as unset.
+**Decision:** `MOCK_EXTERNAL_APIS=true` default + `_is_real_secret()` rejects `...` and template values.
+**Reasoning:** Developers can copy `.env.example` and work immediately. Real tokens opt in by setting non-placeholder values and `MOCK_EXTERNAL_APIS=false`.
+**Consequences:** All provider selection goes through `Settings.use_mock_*` properties. Never check raw env strings for "is configured".
+
+---
+
+### [2025-06-08] Mock Telegram notifier logs to JSONL file
+
+**Context:** Outbound messages can't be sent without a bot token.
+**Options considered:** (a) Skip send silently. (b) Log to stdout only. (c) Append to `data/mock_notifications.jsonl`.
+**Decision:** JSONL file in `data/` (gitignored).
+**Reasoning:** Inspectable audit trail for dev and integration tests; mirrors what would be sent to Telegram.
+**Consequences:** Production must use real `send_message` path when `use_mock_telegram` is false.
+
+---
+
+### [2025-06-08] Rule-based learning agent as LLM fallback
+
+**Context:** No Anthropic key during unattended build.
+**Options considered:** (a) Skip learning agent. (b) Hard-code a few test cases only. (c) Regex/keyword extraction with same `ExtractedFact` schema as Claude path.
+**Decision:** Keyword extraction for injury, travel, preferences, and "forget X" commands.
+**Reasoning:** Exercises the full pipeline (extract → apply → suppress) without API cost. Claude path remains for production.
+**Consequences:** Add new patterns to `extract_facts_mock()` when selftest scenarios need them.
+
+---
+
 ### [2025-06-08] APScheduler chosen over Celery for MVP scheduler
 
 **Context:** Need a background job system to run per-user suggestion checks on a schedule.

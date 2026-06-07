@@ -1,28 +1,9 @@
 # Agent scratchpad
-# This file is the agent's working memory. Overwrite it freely.
-# It persists between sessions so a new session can pick up mid-task.
 
-Status: EMPTY — no active task in progress.
+Status: EMPTY — overnight build completed 2025-06-08.
 
----
+Last session: autonomous overnight build on `dev` branch.
+- 24/24 pytest pass, 8/8 YAML scenarios pass
+- See `docs/MORNING_BRIEF.md` for handoff
 
-## Usage
-
-When starting a multi-step task, write your plan here before executing:
-
-```
-## Current task: [description]
-Started: [timestamp]
-Phase: [current phase from PLAN.md]
-
-### Sub-tasks
-- [ ] Step 1
-- [x] Step 2 (done)
-- [ ] Step 3
-
-### In-progress notes
-[anything that would help a fresh session pick this up]
-
-### Decisions made during this task
-[quick notes — full decisions go in DECISIONS.md]
-```
+Next session should start with: Docker compose verification + Telegram token setup.
