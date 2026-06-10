@@ -6,6 +6,15 @@ mo:
   location_lat: 38.7223
   location_lng: -9.1393
   location_label: Lisbon, Portugal
+  quiet_hours_start: 22
+  quiet_hours_end: 7
+  max_suggestions_per_day: 2
+  check_in_frequency_days: 14
+  default_scenario: mo_surf_perfect
+  calendar:
+    connected: false
+    provider: google
+    sync_enabled: false
   hobbies:
     - hobby_type: surf
       enabled: true
@@ -23,7 +32,37 @@ mo:
         max_wind_kmh: 30
         weekend_only: true
   contacts: []
-  profile_facts: []
+  profile_facts:
+    - category: location
+      fact: Based in Lisbon, surfs at Costa da Caparica
+      valid_from: "2025-01-15T00:00:00+00:00"
+      source: onboarding
+    - category: preference
+      fact: Prefers morning surf sessions before work
+      valid_from: "2025-02-01T00:00:00+00:00"
+      source: conversation
+  conversations:
+    - direction: inbound
+      channel: telegram
+      message_text: "I mostly surf at Caparica on weekday mornings"
+      created_at: "2025-05-28T08:12:00+00:00"
+    - direction: outbound
+      channel: telegram
+      message_text: "Got it — I'll prioritise morning windows near Caparica for surf."
+      created_at: "2025-05-28T08:12:30+00:00"
+    - direction: inbound
+      channel: telegram
+      message_text: "/start"
+      created_at: "2025-05-20T10:00:00+00:00"
+  suggestions:
+    - hobby_type: surf
+      window_start: "2025-06-07T07:30:00+01:00"
+      window_end: "2025-06-07T10:00:00+01:00"
+      score: 0.82
+      conditions_summary: "1.4m swell, light offshore"
+      message_text: "Tomorrow 7:30–10:00 — clean 1.4m swell at Caparica. Calendar is clear."
+      sent_at: "2025-06-06T18:00:00+01:00"
+      response: confirm
 
 anneka:
   id: "22222222-2222-4222-8222-222222222222"
@@ -33,6 +72,16 @@ anneka:
   location_lat: 48.1351
   location_lng: 11.5820
   location_label: Munich, Germany
+  quiet_hours_start: 23
+  quiet_hours_end: 8
+  max_suggestions_per_day: 3
+  check_in_frequency_days: 10
+  default_scenario: anneka_call_sunday
+  calendar:
+    connected: true
+    provider: google
+    sync_enabled: true
+    calendar_id: primary
   hobbies:
     - hobby_type: call_friend
       enabled: true
@@ -47,7 +96,29 @@ anneka:
       relationship_type: family
       contact_frequency_days: 14
       last_contacted_at: "2025-05-20T10:00:00+00:00"
-  profile_facts: []
+  profile_facts:
+    - category: social
+      fact: Tracks close friends and family for regular check-ins
+      valid_from: "2025-03-01T00:00:00+00:00"
+      source: onboarding
+  conversations:
+    - direction: inbound
+      channel: telegram
+      message_text: "Can you remind me to call my mum more often?"
+      created_at: "2025-05-10T14:30:00+00:00"
+    - direction: outbound
+      channel: telegram
+      message_text: "I'll nudge you when it's been a while since you called Mother."
+      created_at: "2025-05-10T14:30:45+00:00"
+  suggestions:
+    - hobby_type: call_friend
+      window_start: "2025-06-01T15:00:00+02:00"
+      window_end: "2025-06-01T17:00:00+02:00"
+      score: 0.71
+      conditions_summary: "Sunday afternoon free, Maria overdue"
+      message_text: "You have a free slot Sunday afternoon — good time to call Maria?"
+      sent_at: "2025-05-31T09:00:00+02:00"
+      response: snooze
 
 darian:
   id: "33333333-3333-4333-8333-333333333333"
@@ -57,6 +128,15 @@ darian:
   location_lat: 51.5074
   location_lng: -0.1278
   location_label: London, UK
+  quiet_hours_start: 22
+  quiet_hours_end: 7
+  max_suggestions_per_day: 2
+  check_in_frequency_days: 14
+  default_scenario: darian_call_overdue
+  calendar:
+    connected: true
+    provider: google
+    sync_enabled: true
   hobbies:
     - hobby_type: hiking
       enabled: true
@@ -78,4 +158,38 @@ darian:
       relationship_type: friend
       contact_frequency_days: 30
       last_contacted_at: "2025-05-25T18:00:00+00:00"
-  profile_facts: []
+  profile_facts:
+    - category: health
+      fact: Recovering from knee strain — avoid long hikes until July
+      valid_from: "2025-05-15T00:00:00+00:00"
+      valid_until: "2025-07-15T00:00:00+00:00"
+      source: conversation
+    - category: hobby
+      fact: Enjoys day hikes in the Chilterns
+      valid_from: "2025-01-01T00:00:00+00:00"
+      source: onboarding
+  conversations:
+    - direction: inbound
+      channel: telegram
+      message_text: "Pulled something in my knee — probably skip hiking for a few weeks"
+      created_at: "2025-05-15T19:00:00+00:00"
+      extracted_facts:
+        category: health
+        fact: knee strain
+    - direction: outbound
+      channel: telegram
+      message_text: "Noted — I'll hold hiking suggestions until you're recovered."
+      created_at: "2025-05-15T19:00:30+00:00"
+    - direction: inbound
+      channel: telegram
+      message_text: "What do you know about me?"
+      created_at: "2025-06-01T12:00:00+00:00"
+  suggestions:
+    - hobby_type: call_friend
+      window_start: "2025-06-08T11:00:00+01:00"
+      window_end: "2025-06-08T13:00:00+01:00"
+      score: 0.88
+      conditions_summary: "Felix overdue by 12+ weeks"
+      message_text: "Free slot tomorrow — Felix is well overdue for a catch-up."
+      sent_at: "2025-06-07T08:00:00+01:00"
+      response: dismiss

@@ -58,3 +58,28 @@ async def test_dev_login_and_tools(client):
     body = evaluate.json()
     assert body["user"] == "mo"
     assert len(body["suggestions"]) >= 1
+
+
+@pytest.mark.asyncio
+async def test_profile_summary(client):
+    login = await client.post("/auth/dev-login", json={"user": "anneka"})
+    assert login.status_code == 200
+    token = login.json()["access_token"]
+
+    response = await client.get(
+        "/profile/summary",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["user_key"] == "anneka"
+    assert data["calendar"]["connected"] is True
+    assert len(data["contacts"]) == 2
+    assert data["preferences"]["timezone"] == "Europe/Berlin"
+
+    settings = await client.get(
+        "/profile/settings",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert settings.status_code == 200
+    assert settings.json()["max_suggestions_per_day"] == 3

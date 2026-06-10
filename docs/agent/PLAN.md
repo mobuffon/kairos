@@ -103,11 +103,11 @@ Last updated by: overnight agent session 2025-06-08
 
 ## Phase 7 — web UI
 
-- [~] Create Next.js app with Tailwind CSS (basic inline styles, no Tailwind yet)
+- [x] Create Next.js app with Tailwind CSS
 - [ ] Implement Telegram Login Widget auth → JWT exchange
 - [x] Build `/onboard` page — hobby setup form (fallback for non-Telegram users) — stub
-- [x] Build `/dashboard` page — upcoming suggestions, recent history, hobby toggles
-- [x] Build `/settings` page — thresholds, quiet hours, location, calendar link
+- [x] Build `/dashboard` page — user-centric sections (contacts, calendar, hobbies, facts, conversations, suggestions)
+- [x] Build `/settings` page — tool connections (Google, Telegram) + user preference fields
 - [ ] Build `/profile` page — current known facts, contact list, delete fact UI
 - [x] Connect all pages to FastAPI backend via typed API client
 - [x] Build `/dev/scenarios` page — run selftests and evaluate scenarios
@@ -129,6 +129,7 @@ Last updated by: overnight agent session 2025-06-08
 
 ## Backlog (post-MVP)
 
+- [ ] `user_settings` table — dedicated key/value settings store (timezone, quiet hours, notification prefs currently live on `users` table)
 - [ ] Cinema / movies skill (TMDB API)
 - [ ] WhatsApp channel support (Twilio)
 - [ ] Vacation planning skill (long calendar gap detection)

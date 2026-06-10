@@ -9,6 +9,76 @@ export type Suggestion = {
   message: string;
 };
 
+export type Contact = {
+  name: string;
+  relationship_type?: string | null;
+  contact_frequency_days: number;
+  last_contacted_at?: string | null;
+  notes?: string | null;
+};
+
+export type CalendarStatus = {
+  connected: boolean;
+  provider: string;
+  sync_enabled: boolean;
+  calendar_id: string;
+};
+
+export type Hobby = {
+  hobby_type: string;
+  enabled: boolean;
+  config: Record<string, unknown>;
+};
+
+export type ProfileFact = {
+  category: string;
+  fact: string;
+  valid_from?: string | null;
+  valid_until?: string | null;
+  source?: string | null;
+};
+
+export type Conversation = {
+  direction: string;
+  channel: string;
+  message_text: string;
+  created_at: string;
+  extracted_facts?: Record<string, unknown> | null;
+};
+
+export type SuggestionHistory = {
+  hobby_type: string;
+  window_start: string;
+  window_end: string;
+  score: number;
+  conditions_summary?: string | null;
+  message_text?: string | null;
+  sent_at?: string | null;
+  response?: string | null;
+};
+
+export type UserPreferences = {
+  timezone: string;
+  location_label?: string | null;
+  quiet_hours_start: number;
+  quiet_hours_end: number;
+  max_suggestions_per_day: number;
+  check_in_frequency_days: number;
+  telegram_username?: string | null;
+};
+
+export type ProfileSummary = {
+  user_key: string;
+  preferences: UserPreferences;
+  contacts: Contact[];
+  calendar: CalendarStatus;
+  hobbies: Hobby[];
+  profile_facts: ProfileFact[];
+  conversations: Conversation[];
+  suggestions: SuggestionHistory[];
+  upcoming_suggestions: Suggestion[];
+};
+
 export async function devLogin(user: string): Promise<string> {
   const res = await fetch(`${API_URL}/auth/dev-login`, {
     method: "POST",
@@ -18,6 +88,22 @@ export async function devLogin(user: string): Promise<string> {
   if (!res.ok) throw new Error("Login failed");
   const data = await res.json();
   return data.access_token as string;
+}
+
+export async function getProfileSummary(token: string): Promise<ProfileSummary> {
+  const res = await fetch(`${API_URL}/profile/summary`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to load profile");
+  return res.json();
+}
+
+export async function getUserSettings(token: string): Promise<UserPreferences> {
+  const res = await fetch(`${API_URL}/profile/settings`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to load settings");
+  return res.json();
 }
 
 export async function evaluateUser(token: string, scenario?: string): Promise<Suggestion[]> {
