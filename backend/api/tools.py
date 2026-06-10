@@ -7,6 +7,7 @@ from backend.api.deps import get_current_user_key
 from backend.providers.mock.provider import MockProvider
 from backend.scheduler.jobs import evaluate_user
 from backend.selftest.scenario_runner import run_all_scenarios
+from backend.services.week_forecast import evaluate_week_query
 
 router = APIRouter(prefix="/tools", tags=["tools"])
 
@@ -35,6 +36,32 @@ async def run_selftest() -> dict[str, Any]:
         "all_passed": passed == len(results),
         "results": [
             {"id": r.scenario_id, "passed": r.passed, "message": r.message} for r in results
+        ],
+    }
+
+
+@router.get("/week-check")
+async def week_check(
+    location: str,
+    sports: str | None = None,
+) -> dict[str, Any]:
+    from backend.services.geocoding import parse_sports_list
+
+    sport_list = parse_sports_list(sports) if sports else None
+    result = await evaluate_week_query(location, sport_list)
+    return {
+        "location": result.location.name,
+        "sports": result.sports,
+        "message": result.message,
+        "windows": [
+            {
+                "day": w.date_label,
+                "period": w.period,
+                "sport": w.hobby_type,
+                "score": w.score,
+                "conditions": w.conditions,
+            }
+            for w in result.windows
         ],
     }
 

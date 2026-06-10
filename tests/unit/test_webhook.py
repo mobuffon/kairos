@@ -13,6 +13,7 @@ _START_UPDATE = {
         "date": 0,
         "text": "/start",
         "chat": {"id": 123456789, "type": "private"},
+        "from": {"id": 123456789, "username": "webhook_test"},
     },
 }
 
@@ -91,4 +92,5 @@ async def test_webhook_accepts_secret_and_handles_start(live_client, live_telegr
     assert body["handled"] is True
     assert body["reply_sent"] is True
     assert len(sent) == 1
-    assert "Welcome to Kairos" in sent[0]["text"]
+    assert "Welcome" in sent[0]["text"]
+    assert "Kairos" in sent[0]["text"]

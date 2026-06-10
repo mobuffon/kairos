@@ -33,10 +33,31 @@ async def test_selftest_endpoint(client):
 async def test_telegram_webhook_mock(client):
     response = await client.post(
         "/bot/webhook",
-        json={"update_id": 1, "message": {"text": "/start", "chat": {"id": 123}}},
+        json={
+            "update_id": 1,
+            "message": {
+                "text": "/start",
+                "chat": {"id": 123, "type": "private"},
+                "from": {"id": 123, "username": "mockuser"},
+            },
+        },
     )
     assert response.status_code == 200
     assert response.json()["handled"] is True
+
+
+@pytest.mark.asyncio
+async def test_telegram_week_check_webhook(client):
+    response = await client.post(
+        "/bot/webhook",
+        json={
+            "update_id": 2,
+            "message": {"text": "Check my week for Lisbon and surf", "chat": {"id": 123}},
+        },
+    )
+    assert response.status_code == 200
+    assert response.json()["handled"] is True
+    assert response.json()["reply_sent"] is True
 
 
 @pytest.mark.asyncio

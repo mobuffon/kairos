@@ -189,7 +189,10 @@ If `mock=true` appears, the app is still in mock mode — check `MOCK_EXTERNAL_A
 Telegram → ngrok → POST /bot/webhook
          → backend/api/bot.py (validates X-Telegram-Bot-Api-Secret-Token)
          → bot/telegram/webhook.py handle_webhook_update()
-         → /start → send_message() welcome text
+         → get_or_create_user_by_telegram_id()
+         → slash commands → backend/services/profile.py
+         → free text → learning agent → persist facts + conversations
+         → send_message() reply
 ```
 
 ### Does `/start` send a message?
@@ -198,7 +201,36 @@ Telegram → ngrok → POST /bot/webhook
 
 ### Is a user created in the database on `/start`?
 
-**Not yet.** `/start` only sends the welcome message. User rows are not created automatically; onboarding still uses mock fixtures for non-`/start` messages. DB-backed user creation is planned for a later phase.
+**Yes.** `/start` calls `get_or_create_user_by_telegram_id` with the sender's Telegram ID. All later messages use that DB user for profile data, facts, and conversations.
+
+---
+
+## Bot commands
+
+Send `/help` in Telegram for the full list. Quick reference:
+
+| Command | Purpose |
+|---------|---------|
+| `/start` | Welcome message; creates your user row |
+| `/help` | List all commands |
+| `/what` | Show stored profile facts |
+| `/add_contact Name \| friend \| 30` | Add a contact (name, relationship, check-in days) |
+| `/contacts` | List contacts |
+| `/delete_contact Name` | Remove a contact |
+| `/add_hobby surf` | Enable a hobby (`surf`, `cycling`, `hiking`, `call_friend`) |
+| `/hobbies` | List hobbies and config |
+| `/delete_hobby surf` | Remove a hobby |
+| `/set_hobby surf min_wave=1.2` | Update hobby thresholds |
+| `/add_fact category \| fact text` | Add a profile fact |
+| `/facts` | List active facts |
+| `/delete_fact keyword` | Delete a fact by keyword or id prefix |
+
+Natural language also works — e.g. "I broke my arm" or "forget that I prefer mornings" — and is saved to your profile automatically.
+
+Week-ahead weather:
+
+- `Check my week for Lisbon and surf`
+- `/week Ericeira surfing, cycling`
 
 ---
 

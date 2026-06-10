@@ -1,8 +1,16 @@
 import pytest
+import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
 from backend.core.config import Settings, get_settings
+from backend.core.db import engine
 from backend.main import app
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def reset_db_engine():
+    yield
+    await engine.dispose()
 
 
 @pytest.fixture(autouse=True)
