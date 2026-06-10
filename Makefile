@@ -1,4 +1,4 @@
-.PHONY: dev dev-bg ngrok test lint migrate shell logs reset-db
+.PHONY: dev dev-bg ngrok webhook-set test lint migrate shell logs reset-db
 
 # ── Development ──────────────────────────────────────────────────────────────
 
@@ -11,6 +11,16 @@ dev-bg:
 # Start stack with ngrok tunnel for Telegram webhook local dev (requires NGROK_AUTHTOKEN in .env)
 ngrok:
 	docker-compose --profile ngrok up --build -d
+
+# Register Telegram webhook using ngrok public URL + TELEGRAM_WEBHOOK_SECRET from .env
+webhook-set:
+	@set -a && . ./.env && set +a && \
+	NGROK_URL=$$(curl -sf http://localhost:4040/api/tunnels | python3 -c "import json,sys; t=json.load(sys.stdin)['tunnels']; print(next(x['public_url'] for x in t if x['public_url'].startswith('https')))") && \
+	echo "Setting webhook to $$NGROK_URL/bot/webhook" && \
+	curl -sf -X POST "https://api.telegram.org/bot$$TELEGRAM_BOT_TOKEN/setWebhook" \
+		-d "url=$$NGROK_URL/bot/webhook" \
+		-d "secret_token=$$TELEGRAM_WEBHOOK_SECRET" && echo && \
+	curl -sf "https://api.telegram.org/bot$$TELEGRAM_BOT_TOKEN/getWebhookInfo" | python3 -m json.tool
 
 stop:
 	docker-compose down

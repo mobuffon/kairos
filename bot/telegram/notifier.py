@@ -52,5 +52,5 @@ async def send_message(
             response.raise_for_status()
             return response.json()
     except Exception as exc:
-        logger.error("telegram_send_failed", error=str(exc))
+        logger.error("telegram_send_failed", chat_id=chat_id, error=str(exc))
         raise

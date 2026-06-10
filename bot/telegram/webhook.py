@@ -95,5 +95,21 @@ async def handle_webhook_update(update: dict[str, Any]) -> dict[str, Any]:
         reply = result["reply"]
         logger.info("facts_extracted", count=len(result["extracted"]))
 
-    await send_message(chat_id, reply, user_id="mock")
-    return {"ok": True, "update_id": update_id, "handled": True, "mock": settings.use_mock_telegram}
+    try:
+        await send_message(chat_id, reply, user_id="mock")
+    except Exception as exc:
+        logger.error("reply_send_failed", chat_id=chat_id, error=str(exc))
+        return {
+            "ok": True,
+            "update_id": update_id,
+            "handled": True,
+            "reply_sent": False,
+            "mock": settings.use_mock_telegram,
+        }
+    return {
+        "ok": True,
+        "update_id": update_id,
+        "handled": True,
+        "reply_sent": True,
+        "mock": settings.use_mock_telegram,
+    }
