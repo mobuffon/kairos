@@ -1,4 +1,4 @@
-.PHONY: dev test lint migrate shell logs reset-db
+.PHONY: dev dev-bg ngrok test lint migrate shell logs reset-db
 
 # ── Development ──────────────────────────────────────────────────────────────
 
@@ -7,6 +7,10 @@ dev:
 
 dev-bg:
 	docker-compose up --build -d
+
+# Start stack with ngrok tunnel for Telegram webhook local dev (requires NGROK_AUTHTOKEN in .env)
+ngrok:
+	docker-compose --profile ngrok up --build -d
 
 stop:
 	docker-compose down

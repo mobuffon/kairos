@@ -37,12 +37,29 @@ make test
 
 Then open `http://localhost:3000` for the web UI.
 
-Register Telegram webhook (after deploying or using ngrok):
+### Telegram webhooks (local)
+
+Expose the app to Telegram during local dev with the optional ngrok service:
+
+1. Add `NGROK_AUTHTOKEN` to `.env` ([get a token](https://dashboard.ngrok.com/get-started/your-authtoken))
+2. Start the stack with ngrok: `docker compose --profile ngrok up -d`
+3. Open [http://localhost:4040](http://localhost:4040) for the public HTTPS URL (copy the `https://….ngrok-free.app` forwarding target)
+4. Register the webhook (use the ngrok URL + `/bot/webhook`):
 
 ```bash
-curl -X POST https://api.telegram.org/bot<TOKEN>/setWebhook \
-  -d url=https://your-domain.com/bot/webhook \
-  -d secret_token=<TELEGRAM_WEBHOOK_SECRET>
+curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
+  -d "url=https://<your-ngrok-subdomain>.ngrok-free.app/bot/webhook" \
+  -d "secret_token=<TELEGRAM_WEBHOOK_SECRET>"
+```
+
+The free ngrok URL changes every time the ngrok container restarts — re-run `setWebhook` after each restart.
+
+For production, use your deployed domain instead of ngrok:
+
+```bash
+curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
+  -d "url=https://your-domain.com/bot/webhook" \
+  -d "secret_token=<TELEGRAM_WEBHOOK_SECRET>"
 ```
 
 ---
@@ -97,6 +114,7 @@ migrations/   Alembic database migrations
 
 ```bash
 make dev          # start everything with hot reload (Docker)
+make ngrok        # start stack + ngrok tunnel (Telegram webhook local dev)
 make test         # run all tests
 make lint         # check code style
 make migrate      # apply pending migrations
