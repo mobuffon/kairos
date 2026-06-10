@@ -72,6 +72,8 @@ services:
       - "3000:3000"
     volumes:
       - .:/app
+      # Keep dev build cache inside Docker so host `next build` cannot corrupt it.
+      - frontend_next:/app/frontend/.next
     command: sh -c "npm install && npm run dev"
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000
@@ -94,3 +96,4 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  frontend_next:
