@@ -88,7 +88,7 @@ class UserContact(Base):
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     name: Mapped[str] = mapped_column(Text, nullable=False)
-    relationship: Mapped[str | None] = mapped_column(Text)
+    relationship_type: Mapped[str | None] = mapped_column(Text)
     contact_frequency_days: Mapped[int] = mapped_column(Integer, default=30)
     last_contacted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     notes: Mapped[str | None] = mapped_column(Text)

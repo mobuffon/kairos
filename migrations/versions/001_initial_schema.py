@@ -69,7 +69,7 @@ def upgrade() -> None:
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
         sa.Column("user_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
         sa.Column("name", sa.Text(), nullable=False),
-        sa.Column("relationship", sa.Text()),
+        sa.Column("relationship_type", sa.Text()),
         sa.Column("contact_frequency_days", sa.Integer(), server_default="30"),
         sa.Column("last_contacted_at", sa.DateTime(timezone=True)),
         sa.Column("notes", sa.Text()),

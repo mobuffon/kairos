@@ -40,11 +40,11 @@ anneka:
         min_window_hours: 1.0
   contacts:
     - name: Maria
-      relationship: friend
+      relationship_type: friend
       contact_frequency_days: 30
       last_contacted_at: "2025-05-01T10:00:00+00:00"
     - name: Mother
-      relationship: family
+      relationship_type: family
       contact_frequency_days: 14
       last_contacted_at: "2025-05-20T10:00:00+00:00"
   profile_facts: []
@@ -71,11 +71,11 @@ darian:
         min_window_hours: 0.5
   contacts:
     - name: Felix
-      relationship: friend
+      relationship_type: friend
       contact_frequency_days: 42
       last_contacted_at: "2025-03-15T14:00:00+00:00"
     - name: Sam
-      relationship: friend
+      relationship_type: friend
       contact_frequency_days: 30
       last_contacted_at: "2025-05-25T18:00:00+00:00"
   profile_facts: []

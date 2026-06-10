@@ -13,15 +13,24 @@ def clear_settings_cache():
 
 
 def test_effective_provider_mock_when_no_keys():
-    settings = Settings(mock_external_apis=False, llm_provider="")
+    settings = Settings(
+        _env_file=None,
+        mock_external_apis=False,
+        llm_provider="",
+        anthropic_api_key="",
+        openrouter_api_key="",
+    )
     assert settings.effective_llm_provider == "mock"
     assert settings.use_mock_llm is True
 
 
 def test_effective_provider_anthropic_auto():
     settings = Settings(
+        _env_file=None,
         mock_external_apis=False,
+        llm_provider="",
         anthropic_api_key="sk-ant-real-key-12345",
+        openrouter_api_key="",
     )
     assert settings.effective_llm_provider == "anthropic"
     assert settings.use_mock_llm is False
@@ -37,7 +46,13 @@ def test_effective_provider_openrouter_explicit():
 
 
 def test_effective_provider_openrouter_without_key_falls_back_to_mock():
-    settings = Settings(mock_external_apis=False, llm_provider="openrouter")
+    settings = Settings(
+        _env_file=None,
+        mock_external_apis=False,
+        llm_provider="openrouter",
+        anthropic_api_key="",
+        openrouter_api_key="",
+    )
     assert settings.effective_llm_provider == "mock"
 
 

@@ -66,7 +66,7 @@ user_contacts
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid()
   user_id         uuid REFERENCES users(id) ON DELETE CASCADE
   name            text NOT NULL
-  relationship    text                          -- 'friend' | 'family' | 'colleague'
+  relationship_type text                        -- 'friend' | 'family' | 'colleague'
   contact_frequency_days int DEFAULT 30
   last_contacted_at timestamptz
   notes           text
