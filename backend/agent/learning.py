@@ -6,6 +6,7 @@ from typing import Any, Literal
 import json
 import re
 
+from backend.agent.llm import complete
 from backend.agent.prompts import LEARNING_SYSTEM
 from backend.core.config import get_settings
 
@@ -94,36 +95,34 @@ async def extract_facts_from_message(
     if use_mock:
         return extract_facts_mock(message)
 
-    try:
-        import anthropic
-
-        client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
-        prompt = f"User message: {message}\nExisting context: {user_context or {}}"
-        response = await client.messages.create(
-            model=settings.anthropic_model,
-            max_tokens=400,
-            system=LEARNING_SYSTEM,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        block = response.content[0]
-        text = block.text if hasattr(block, "text") else "[]"
-        raw = json.loads(text)
-        results: list[ExtractedFact] = []
-        for item in raw:
-            valid_until = None
-            if item.get("valid_until"):
-                valid_until = datetime.fromisoformat(item["valid_until"])
-            results.append(
-                ExtractedFact(
-                    category=item["category"],
-                    fact=item["fact"],
-                    valid_until=valid_until,
-                    action=item.get("action", "add"),
+    prompt = f"User message: {message}\nExisting context: {user_context or {}}"
+    text = await complete(
+        system=LEARNING_SYSTEM,
+        user=prompt,
+        max_tokens=400,
+        settings=settings,
+    )
+    if text:
+        try:
+            raw = json.loads(text)
+            results: list[ExtractedFact] = []
+            for item in raw:
+                valid_until = None
+                if item.get("valid_until"):
+                    valid_until = datetime.fromisoformat(item["valid_until"])
+                results.append(
+                    ExtractedFact(
+                        category=item["category"],
+                        fact=item["fact"],
+                        valid_until=valid_until,
+                        action=item.get("action", "add"),
+                    )
                 )
-            )
-        return results
-    except Exception:
-        return extract_facts_mock(message)
+            return results
+        except Exception:
+            pass
+
+    return extract_facts_mock(message)
 
 
 def apply_facts_to_profile(

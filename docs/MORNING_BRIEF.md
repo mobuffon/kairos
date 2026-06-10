@@ -30,7 +30,7 @@ uvicorn backend.main:app --reload   # then open http://localhost:3000/dev/scenar
 ## Blocked on you
 - `TELEGRAM_BOT_TOKEN` — needed for real outbound messages (mock logs to `data/mock_notifications.jsonl` until set)
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — needed for real calendar sync (mock provider works now)
-- `ANTHROPIC_API_KEY` — optional; rule-based LLM fallback active when unset
+- `ANTHROPIC_API_KEY` or `OPENROUTER_API_KEY` — optional; set `LLM_PROVIDER=anthropic|openrouter` in `.env` (rule-based mock fallback when unset)
 
 ## Recommended next steps (priority order)
 1. Run `docker compose up --build -d && make migrate` and confirm health endpoint shows db/redis ok

@@ -28,7 +28,7 @@ Open `http://localhost:3000` for the web UI, or `http://localhost:3000/dev/scena
 
 ```bash
 cp .env.example .env
-# Optionally fill in ANTHROPIC_API_KEY, TELEGRAM_BOT_TOKEN, GOOGLE_CLIENT_ID
+# Optionally fill in LLM_PROVIDER + API key, TELEGRAM_BOT_TOKEN, GOOGLE_CLIENT_ID
 
 docker compose up --build -d
 make migrate
@@ -47,17 +47,38 @@ curl -X POST https://api.telegram.org/bot<TOKEN>/setWebhook \
 
 ---
 
+## LLM configuration
+
+Kairos supports three LLM backends, selected via `LLM_PROVIDER` in `.env`:
+
+| Provider | Env vars | Notes |
+|---|---|---|
+| `mock` | (default) | Rule-based messages and fact extraction — no API key |
+| `anthropic` | `ANTHROPIC_API_KEY`, optional `ANTHROPIC_MODEL` | Direct Claude API |
+| `openrouter` | `OPENROUTER_API_KEY`, optional `OPENROUTER_MODEL` | OpenAI-compatible proxy; get a key at [openrouter.ai/keys](https://openrouter.ai/keys) |
+
+When `LLM_PROVIDER` is unset, Kairos auto-selects: Anthropic if `ANTHROPIC_API_KEY` is set, else OpenRouter if `OPENROUTER_API_KEY` is set, else mock.
+
+Example `.env` for OpenRouter:
+
+```bash
+MOCK_EXTERNAL_APIS=false
+LLM_PROVIDER=openrouter
+OPENROUTER_API_KEY=sk-or-v1-your-key-here
+OPENROUTER_MODEL=anthropic/claude-sonnet-4
+```
+
 ## Mock mode
 
 Set `MOCK_EXTERNAL_APIS=true` in `.env` to run without external services:
 
 | Service | Mock behaviour |
 |---|---|
-| Anthropic | Rule-based message generation and fact extraction |
+| LLM | Rule-based message generation and fact extraction |
 | Telegram | Webhook works; outbound messages logged to `data/mock_notifications.jsonl` |
 | Google Calendar | OAuth URL returns mock link; gaps from YAML fixtures |
 
-Placeholder values in `.env` (`...`, `sk-ant-...`) are treated as unset.
+Placeholder values in `.env` (`...`, `sk-ant-...`, `sk-or-...`) are treated as unset.
 
 ---
 
@@ -102,5 +123,5 @@ Read `CLAUDE.md` (Claude) or `.cursor/rules` (Cursor) before doing anything. The
 - **Bot:** Telegram webhook (python-telegram-bot patterns)
 - **Database:** PostgreSQL 16
 - **Cache/Queue:** Redis 7
-- **LLM:** Anthropic Claude API (optional — mock fallback built in)
+- **LLM:** Anthropic Claude or OpenRouter (optional — mock fallback built in)
 - **Deploy:** Docker Compose (local), Railway (production)

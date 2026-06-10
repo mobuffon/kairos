@@ -3,7 +3,12 @@ from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-_PLACEHOLDER_VALUES = frozenset({"...", "sk-ant-...", "change-me-to-random-32-char-string"})
+_PLACEHOLDER_VALUES = frozenset({
+    "...",
+    "sk-ant-...",
+    "sk-or-...",
+    "change-me-to-random-32-char-string",
+})
 
 
 def _is_real_secret(value: str) -> bool:
@@ -16,8 +21,11 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://kairos:kairos@localhost:5432/kairos"
     redis_url: str = "redis://localhost:6379/0"
 
+    llm_provider: str = ""
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-sonnet-4-20250514"
+    openrouter_api_key: str = ""
+    openrouter_model: str = "anthropic/claude-sonnet-4"
 
     telegram_bot_token: str = ""
     telegram_webhook_secret: str = "dev-webhook-secret"
@@ -40,8 +48,27 @@ class Settings(BaseSettings):
     mock_external_apis: bool = False
 
     @property
+    def effective_llm_provider(self) -> Literal["anthropic", "openrouter", "mock"]:
+        if self.mock_external_apis:
+            return "mock"
+
+        provider = self.llm_provider.strip().lower()
+        if provider == "mock":
+            return "mock"
+        if provider == "openrouter":
+            return "openrouter" if _is_real_secret(self.openrouter_api_key) else "mock"
+        if provider == "anthropic":
+            return "anthropic" if _is_real_secret(self.anthropic_api_key) else "mock"
+
+        if _is_real_secret(self.anthropic_api_key):
+            return "anthropic"
+        if _is_real_secret(self.openrouter_api_key):
+            return "openrouter"
+        return "mock"
+
+    @property
     def use_mock_llm(self) -> bool:
-        return self.mock_external_apis or not _is_real_secret(self.anthropic_api_key)
+        return self.effective_llm_provider == "mock"
 
     @property
     def use_mock_telegram(self) -> bool:

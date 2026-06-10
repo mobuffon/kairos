@@ -1,6 +1,7 @@
 from typing import Any
 
 from backend.agent.engine import RankedSuggestion
+from backend.agent.llm import complete
 from backend.agent.prompts import SUGGESTION_SYSTEM, SUGGESTION_USER
 from backend.core.config import get_settings
 
@@ -25,30 +26,23 @@ async def generate_suggestion_message(
             f"{suggestion.conditions_summary}."
         )
 
-    try:
-        import anthropic
-
-        client = anthropic.AsyncAnthropic(api_key=get_settings().anthropic_api_key)
-        prompt = SUGGESTION_USER.format(
-            user_name=user_name,
-            location=location,
-            hobby_type=suggestion.hobby_type,
-            window_start=suggestion.window.start.isoformat(),
-            window_end=suggestion.window.end.isoformat(),
-            conditions=suggestion.conditions_summary,
-            score=suggestion.score,
-        )
-        response = await client.messages.create(
-            model=get_settings().anthropic_model,
-            max_tokens=200,
-            system=SUGGESTION_SYSTEM,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        block = response.content[0]
-        if hasattr(block, "text"):
-            return block.text.strip()
-    except Exception:
-        pass
+    prompt = SUGGESTION_USER.format(
+        user_name=user_name,
+        location=location,
+        hobby_type=suggestion.hobby_type,
+        window_start=suggestion.window.start.isoformat(),
+        window_end=suggestion.window.end.isoformat(),
+        conditions=suggestion.conditions_summary,
+        score=suggestion.score,
+    )
+    text = await complete(
+        system=SUGGESTION_SYSTEM,
+        user=prompt,
+        max_tokens=200,
+        settings=settings,
+    )
+    if text:
+        return text
 
     return (
         f"Good moment for {suggestion.hobby_type}: "
